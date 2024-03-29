@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Page Title</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    
+    
+</head>
+<body>
+
+    <%- include('includes/head.ejs',{
+      loggedinUser : loggedinUser
+      }) %>
+
+
+
+  <% 
+  let user = loggedinUser
+  
+
+  if(user) { 
+
+  %>
+
+
+  <h3>Your Profile</h3>
+
+  <img src="<%= user_pic%>" style='float:left;'>
+  <%= user_profile %> <br style='clear:left;'><br>
+
+  <form data-ajax='false' method='post' action='/profile' enctype='multipart/form-data'>
+<h3>Enter or edit your details and/or upload an image</h3>
+<textarea name='text'><%= user_profile %></textarea>><br>
+Image: <input type='file' name='image' id='image' size='14'>
+<input type='submit' value='Save Profile'>
+</form>
+
+  
+<% } %>
+
+</body>
+</html>

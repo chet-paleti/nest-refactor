@@ -1,0 +1,28 @@
+const path = require('path');
+
+const express = require('express');
+
+const Controller = require('../controllers/all_controllers');
+
+const router = express.Router();
+
+router.get('/', Controller.home);
+router.get('/login', Controller.getLogin);
+router.post('/login', Controller.postLogin);
+router.get('/logout', Controller.getLogout);
+router.get('/member', Controller.getMember);
+router.get('/profile', Controller.getProfile);
+router.post('/profile', Controller.postProfile);
+router.get('/signup', Controller.getSignup);
+router.post('/signup', Controller.postSignup);
+router.post('/checkuser', Controller.postCheckuser);
+router.get('/messages', Controller.getMessages);
+router.get('/refreshmessages', Controller.getRefreshMessages);
+router.get('/erasemessage', Controller.getEraseMessage);
+router.get('/members', Controller.getMembers);
+router.post('/messages', Controller.postMessages);
+router.get('/updatemembers', Controller.getUpdateMembers);
+router.get('/friends', Controller.getFriends);
+
+
+module.exports = router;

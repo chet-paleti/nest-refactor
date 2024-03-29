@@ -1,0 +1,484 @@
+//const Nest = require("../models/nest");
+const { request } = require('http');
+const qstring = require('querystring')
+const db = require('../database');
+const { render } = require('ejs');
+
+exports.home = (req, res, next) => {
+ 
+  //req.session.user = 'Chet'
+  let userid = req.session.user ? req.session.user : null
+  
+  res.render('index',{
+    loggedinUser : userid
+  })
+};
+
+exports.getLogin = (req, res, next) => {
+
+  let userid = req.session.user ? req.session.user : null
+
+  res.render('login',{
+    userid : null,
+    password : null,
+    error : '',
+    loggedinUser : userid
+  })
+};
+
+exports.postLogin = (req, res, next) => {
+
+  let user_id = req.body.user
+  let pass_word = req.body.pass
+
+  db.execute(
+    'select user from members WHERE user = ? and pass = ?',
+    [user_id, pass_word]
+  ).then(([rows, fieldData]) => {
+
+    console.log(rows[0])
+
+    
+    if(rows[0]){
+      req.session.user=user_id
+      req.session.isloggedin = true
+
+      res.render('login',{
+        userid : user_id,
+        password : null,
+        error : '',
+        loggedinUser : user_id
+      });
+    }else {
+      res.render('login',{
+        userid : user_id,
+        password : pass_word,
+        error : 'Invalid login attempt',
+        loggedinUser : null
+      });
+    }
+    
+   
+  })
+  .catch(err => console.log(err));
+
+};
+
+exports.getLogout = (req, res, next) => {
+  req.session.destroy(err => {
+    console.log(err);
+    res.redirect('/');
+  });
+
+}
+
+exports.getMember = (req, res, next) => {
+ 
+  //req.session.user = 'Chet'
+  let userid = req.session.user ? req.session.user : null
+  let member = req.query.member
+
+  db.execute(
+    'select user,text from profiles where user=?',
+    [member]
+  ).then(([rows, fieldData]) => {
+
+    let user_profile = rows[0] ? rows[0].text : null
+    res.render('member',{
+      loggedinUser : userid,
+      member : member,
+      user_profile : user_profile,
+      user_pic : `/images/${member}.jpg`
+    })
+    
+    })
+    
+  .catch(err => console.log(err));
+  
+  
+};
+
+exports.getProfile = (req, res, next) => {
+ 
+  //req.session.user = 'Chet'
+  let userid = req.session.user ? req.session.user : null
+
+  if(!userid) {
+
+   return res.render('profile',{
+      loggedinUser : null,
+      user_profile : null,
+      user_pic : null
+    })
+
+  }
+
+  db.execute(
+    'select user,text from profiles where user=?',
+    [userid]
+  ).then(([rows, fieldData]) => {
+
+    let user_profile = rows[0] ? rows[0].text : null
+
+    res.render('profile',{
+      loggedinUser : userid,
+      user_profile : user_profile,
+      user_pic : `/images/${userid}.jpg`
+    })
+    
+    })
+    
+  .catch(err => console.log(err));
+  
+  
+};
+
+
+exports.postProfile = (req, res, next) => {
+ 
+  //req.session.user = 'Chet'
+  let userid = req.session.user ? req.session.user : null
+
+  if(!userid) {
+
+   return res.render('profile',{
+      loggedinUser : null,
+      user_profile : null,
+      user_pic : null
+    })
+
+  }
+
+  let profile_text = req.body.text
+
+  db.execute(
+    'update profiles set text=? where user=?',
+    [profile_text,userid]
+  ).then(([rows, fieldData]) => {
+
+    res.redirect('/profile')
+
+    })
+    
+  .catch(err => console.log(err));
+  
+  
+};
+
+exports.getSignup = (req, res, next) => {
+
+  //let userid = req.session.user ? req.session.user : null
+
+  res.render('signup',{
+    loggedinUser : null,
+    success : false,
+    errormsg : null,
+    user : null,
+    passwd : null
+  })
+};
+
+exports.postCheckuser = (req, res, next) => {
+
+  //let userid = req.session.user ? req.session.user : null
+
+  let userid = req.body.user
+  let msg = ''
+
+  db.execute(
+    'select user from members where user=?',
+    [userid]
+  ).then(([rows, fieldData]) => {
+
+   
+
+    if(rows[0]) {
+     msg =  `<span class='taken'>&nbsp;&#x2718; The username  ${userid} is taken</span>`
+    } else {
+      msg = `<span class='available'>&nbsp;&#x2714; The username ${userid} is available</span>`
+    }
+
+    res.send(msg);
+    
+    })
+    
+  .catch(err => console.log(err));
+
+
+};
+
+exports.postSignup = (req, res, next) => {
+
+  let userid = req.body.user.trim()
+  let passwd = req.body.pass.trim()
+
+  if(userid =='' || passwd == '') {
+
+
+    
+    return res.render('signup',{
+    loggedinUser : null,
+    success : false,
+    errormsg : 'Not all fields were entered',
+    user : null,
+    passwd : null
+    })
+    
+  } 
+
+  db.execute(
+    'select user from members where user=?',
+    [userid]
+  ).then(([rows, fieldData]) => {
+
+    if(rows[0]) {
+      return res.render('signup',{
+        loggedinUser : null,
+        success : false,
+        errormsg : 'That username already exists',
+        user : null,
+        passwd : null
+        })
+    } else {
+
+      db.execute(
+        'insert into members(user,pass) values(?,?)',
+        [userid,passwd]
+      )
+      .then(() => {
+       return res.render('signup',{
+         loggedinUser : null,
+         success : true,
+         errormsg : null,
+         user : null,
+         passwd : null
+         })
+     })
+
+    }
+    })
+    .catch(err => console.log(err));
+
+
+}
+
+exports.getMessages = (req, res, next) => {
+
+  let userid = req.session.user ? req.session.user : null
+  let member = req.query.member
+  let user_profile =''
+  
+
+  db.execute(
+    'select user,text from profiles where user=?',
+    [member]
+  ).then(([rows, fieldData]) => {
+
+    user_profile = rows[0] ? rows[0].text : null
+  
+    
+    }).then(() => {
+
+      db.execute(
+        'select * from messages where recip=? order by time desc',
+        [member]
+      ).then(([rows, fieldData]) => {
+
+        let messages = rows
+
+        return res.render('messages',{
+          loggedinUser : userid,
+          member : member,
+          user_profile : user_profile,
+          user_pic : `/images/${member}.jpg`,
+          messages : rows
+      
+        })
+
+
+      }).catch(err => console.log(err))
+
+  
+  }).catch(err => console.log(err));
+
+}
+
+
+exports.getRefreshMessages = (req, res, next) => {
+
+  let member = req.query.member
+
+  res.redirect(`/messages?member=${member}`)
+
+}
+
+exports.postMessages = (req, res, next) => {
+
+  let userid = req.session.user
+  let member = req.query.member
+  let msg = req.body.text
+  let time = Math.round(Date.now()/1000)
+  let pm = req.body.pm
+ 
+
+    db.execute(
+      'INSERT INTO messages (AUTH, RECIP, PM,TIME,MESSAGE) VALUES (?,?,?,?,?)',
+      [userid,member,pm,time,msg]
+    ).then(([rows, fieldData]) => {
+  
+      res.redirect(`/messages?member=${member}`)
+  
+      })
+      
+    .catch(err => console.log(err));
+
+
+
+}
+
+exports.getEraseMessage = (req, res, next) => {
+
+
+let member = req.query.member
+let erase = req.query.erase
+
+
+if(erase) {
+
+  db.execute(
+    'DELETE FROM messages WHERE id=?',
+    [erase]
+  ).then(([rows, fieldData]) => {
+
+     res.redirect(`/messages?member=${member}`)
+
+    })
+    
+  .catch(err => console.log(err));
+
+}
+
+}
+
+exports.getMembers = (req, res, next) => {
+
+  let user = req.session.user ? req.session.user : null
+  let qstr = `SELECT USER user_1, (SELECT 1 FROM DUAL) flag FROM friends f1 WHERE f1.friend=? AND NOT EXISTS (SELECT * FROM friends f2 WHERE USER=? AND f1.user=f2.friend) 
+  UNION
+  SELECT friend user_1, (SELECT 2 FROM DUAL) flag  FROM friends f1 WHERE f1.user=? AND NOT EXISTS (SELECT * FROM friends f2 WHERE friend=? AND f1.friend=f2.user)
+  UNION
+  SELECT f1.USER user_1, (SELECT 3 FROM DUAL) flag  FROM friends f1, friends f2 WHERE f1.friend=? AND f1.friend=f2.user AND f2.friend=f1.user
+  UNION
+  SELECT USER user_1, (SELECT 0 FROM DUAL) flag FROM members  WHERE USER <> ? and USER NOT IN (SELECT USER FROM friends f2 WHERE f2.friend=? UNION SELECT friend FROM friends f3 WHERE f3.user=?)
+  ORDER BY user_1`
+
+  db.execute(qstr,
+    [user,user,user,user,user,user,user,user]
+  ).then(([rows, fieldData]) => {
+
+    res.render('members',{
+      loggedinUser : user,
+      members : rows
+      })
+
+    })
+    
+  .catch(err => console.log(err));
+ 
+
+}
+
+exports.getUpdateMembers = (req, res, next) => {
+
+  let user = req.session.user ? req.session.user : null
+  let add = req.query.add
+  let drop = req.query.drop
+
+  if(add) {
+
+    db.execute('INSERT INTO friends(user,friend) VALUES (?,?)',
+      [add,user]
+    ).then(([rows, fieldData]) => {
+  
+      return res.redirect('/members')
+  
+      })
+      
+    .catch(err => console.log(err));
+
+  } 
+
+  if(drop) {
+
+    db.execute('DELETE FROM friends WHERE user=? and friend=?',
+      [drop,user]
+    ).then(([rows, fieldData]) => {
+  
+      return res.redirect('/members')
+  
+      })
+      
+    .catch(err => console.log(err));
+
+  } 
+
+
+}
+
+exports.getFriends = (req, res, next) => {
+
+  let user = req.session.user ? req.session.user : null
+  let friends = null
+  let followers = null
+  let followings = null
+
+  db.execute(
+    'SELECT f1.USER user_1, (SELECT 3 FROM DUAL) flag  FROM friends f1, friends f2 WHERE f1.friend=? AND f1.friend=f2.user AND f2.friend=f1.user',
+    [user]
+  ).then(([rows, fieldData]) => {
+
+    friends = rows
+   
+    return db.execute(
+      'SELECT friend user_1, (SELECT 2 FROM DUAL) flag  FROM friends f1 WHERE f1.user=? AND NOT EXISTS (SELECT * FROM friends f2 WHERE friend=? AND f1.friend=f2.user)',
+      [user,user]
+    )
+
+    })
+    .then(([rows, fieldData]) => {
+
+      followers = rows
+
+      return db.execute(
+        'SELECT USER user_1, (SELECT 1 FROM DUAL) flag FROM friends f1 WHERE f1.friend=? AND NOT EXISTS (SELECT * FROM friends f2 WHERE USER=? AND f1.user=f2.friend)',
+        [user,user]
+      )
+
+
+    })
+    .then(([rows, fieldData]) => {
+
+      followings = rows
+
+      res.render('friends',{
+        loggedinUser : user,
+        friends : friends,
+        followers : followers,
+        followings : followings
+      })
+
+    })
+  .catch(err => console.log(err));
+
+
+}
+
+
+
+
+   
+
+    
+
+     
+

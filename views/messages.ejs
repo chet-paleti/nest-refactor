@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Page Title</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    
+    
+</head>
+<body>
+
+    <%- include('includes/head.ejs',{
+      loggedinUser : loggedinUser
+      }) %>
+
+
+
+  <% 
+  let user = loggedinUser
+
+  let name =''
+  let profile = ''
+
+  if(user==member) {
+    name = "Your";
+    profile = user ;
+ } else { 
+   profile = member ;
+   name = profile + "'s" ;
+   
+ }
+
+ 
+
+  
+
+  if(user) { 
+
+  %>
+
+
+  <h3> <%= name %>  Messages</h3>
+ <img src="<%= user_pic %>" style='float:left;'>
+<%= user_profile %> <br style='clear:left;'><br>
+
+<form method='post' action='/messages?member=<%= member %>'>
+    <fieldset data-role="controlgroup" data-type="horizontal">
+      <legend>Type here to leave a message</legend>
+      <input type='radio' name='pm' id='public' value='0' checked='checked'>
+      <label for="public">Public</label>
+      <input type='radio' name='pm' id='private' value='1'>
+      <label for="private">Private</label>
+    </fieldset>
+  <textarea name='text'></textarea>
+  <input data-transition='slide' type='submit' value='Post Message'>
+</form><br>
+
+<% if(messages.length == 0) { %>
+
+    <br><span class='info'>No messages yet</span><br><br>
+
+    <% } %>
+
+
+<% for (let message of messages) { 
+
+  
+    if(message.pm == '0' || message.auth == user || message.recip == user) { 
+        let d = new Date(message.time*1000) %>
+
+        <%= d.toDateString() %>:
+        <a href = '/messages?member=<%= message.auth %>'> <%= message.auth %> </a>
+        <% if(message.pm == '0') {%> wrote <% }
+        else { %> whispered
+        <%} %>
+        : "<%= message.message %>"
+        <% if (message.recip == user) {%>
+            [ <a href='/erasemessage?erase=<%= message.id %>&member=<%= message.recip %>'>erase</a>]
+        
+       <%} %>
+       <br>
+
+<%
+    }
+
+} 
+%>
+ 
+  
+<% } %>
+
+<br><a data-role='button' href='/refreshmessages?member=<%= member %>'>Refresh messages</a>
+
+</body>
+</html>

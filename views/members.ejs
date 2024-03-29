@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Page Title</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    
+    
+</head>
+<body>
+
+    <%- include('includes/head.ejs',{
+      loggedinUser : loggedinUser
+      }) %>
+
+
+      <% 
+      let user = loggedinUser   
+    
+      if(user) { %>
+        <h3>Other Members</h3>
+        <ul>
+        
+        <%  for (let member of members) { %>
+
+        
+        
+            <li><a data-transition='slide' href='/member?member=<%= member.user_1 %>'><%= member.user_1 %></a>
+
+            <% if(member.flag==3) { %>
+
+                &harr; is a mutual friend [<a data-transition='slide' href='/updatemembers?drop=<%= member.user_1 %>'>drop</a>]
+
+            <%  } else if(member.flag==2) { %>
+
+                &rarr; is following you [<a data-transition='slide' href='/updatemembers?add=<%= member.user_1 %>'>recip</a>]
+
+            <%  } else if(member.flag==1) { %>
+
+                &larr; you are following [<a data-transition='slide' href='/updatemembers?drop=<%= member.user_1 %>'>drop</a>]
+            
+            <% } else { %>
+
+                [<a data-transition='slide' href='updatemembers?add=<%= member.user_1 %>'>follow</a>]
+
+            <% } %>
+        
+    
+
+        <% } %>
+
+    </ul>
+    
+    <% }  %>
+
+
+</body>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Page Title</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    
+    
+</head>
+<body>
+
+    <%- include('includes/head.ejs',{
+      loggedinUser : loggedinUser
+      }) %>
+
+
+
+  <% 
+  let user = loggedinUser
+  
+
+  let name =''
+  let profile = ''
+
+  if(user==member) {
+     name = "Your";
+     profile = user ;
+  } else { 
+    profile = member ;
+    name = profile + "'s" ;
+    
+  }
+
+  if(user) { 
+
+  %>
+
+
+  <h3><%= name %> Profile</h3>
+
+  <img src="<%= user_pic%>" style='float:left;'>
+  <%= user_profile %> <br style='clear:left;'><br>
+
+  <a data-role='button' data-transition='slide'
+  href='/messages?member=<%= member %>'>View <%= name %> messages</a>
+  
+<% } %>
+</body>
+</html>

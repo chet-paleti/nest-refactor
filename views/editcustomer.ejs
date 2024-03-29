@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>This is the list of Customers</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+
+    <link rel="stylesheet" href="/css/customer.css">
+    
+    
+</head>
+<body>
+
+    <div id="header">
+        <h2>Enter details of new customer to be added</h2>
+        </div>
+        
+        <div id="form">
+        
+        <form action="/savecustomer" method="POST">
+            
+            <td><input type="hidden" name=id value="<%= edit_customer.id %>"></td>
+            <table>
+            <tbody>
+            <tr>
+             <td><label>First Name</label></td>
+             <td><input type="text" name=fname value="<%= edit_customer.fname %>"></td>
+            </tr>
+            <tr>
+             <td><label>Last Name</label></td>
+             <td><input type="text" name=lname value="<%= edit_customer.lname %>"></td>
+             </tr>
+             <tr>
+             <td><label>Email</label></td>
+             <td><input type="text" name=email value="<%= edit_customer.email %>"></td>
+             </tr>
+             <tr>
+             <td><input type="submit" value="Save Customer"/></td>
+             </tr>
+             
+             </tbody>
+             </table>
+        
+        </form>
+         
+        </div>
+        
+    
+</body>
+</html>

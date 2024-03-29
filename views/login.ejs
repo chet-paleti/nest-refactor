@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Page Title</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    
+ 
+    
+</head>
+<body>
+    <%- include('includes/head.ejs',{
+      loggedinUser : loggedinUser
+      }) %>
+
+
+
+  <% 
+  let validUser = loggedinUser
+  let user = userid
+  let errormsg = error
+  let passwd = password
+
+
+  if(!validUser) {  %>
+	  
+	  <form method='post' action='/login'>
+      <div data-role='fieldcontain'>
+        <label></label>
+        <span class='error'><%= errormsg %></span>
+      </div>
+      <div data-role='fieldcontain'>
+        <label></label>
+        Please enter your details to log in
+      </div>
+      <div data-role='fieldcontain'>
+        <label>Username</label>
+        <input type='text' maxlength='16' name='user' value=<%=user%>>
+      </div>
+      <div data-role='fieldcontain'>
+        <label>Password</label>
+        <input type='password' maxlength='16' name='pass' value=<%=passwd%>>
+      </div>
+      <div data-role='fieldcontain'>
+        <label></label>
+        <input data-transition='slide' type='submit' value='Login'>
+      </div>
+    </form>
+  </div>
+
+<% 	  
+  } else { %>
+  
+   <div class='center'>You are now logged in <%= user %>. Please
+             <a data-transition='slide' href='/member?member=<%= validUser %>'>click here</a>
+             to continue.
+    </div>  
+
+  <% }%>
+    
+</body>
+</html>

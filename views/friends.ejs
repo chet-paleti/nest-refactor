@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Page Title</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    
+    
+</head>
+<body>
+
+    <%- include('includes/head.ejs',{
+      loggedinUser : loggedinUser
+      }) %>
+
+
+      <% 
+      let user = loggedinUser   
+    
+      if(user) {
+      
+      let activity = false
+        
+      %>
+
+        <%   if(friends.length > 0) { activity = true %>
+
+          <span class='subhead'>Your mutual friends</span><ul>
+
+            <%  for (let friend of friends) { %>
+             
+              <li><a data-transition='slide' href='/member?member=<%= friend.user_1 %>'><%= friend.user_1 %></a>     
+
+            <% } %>
+
+          </ul>
+
+        <% } %>
+
+        <%   if(followers.length > 0) {  activity = true %>
+
+          <span class='subhead'>Your followers</span><ul>
+
+            <%  for (let follower of followers) { %>
+             
+              <li><a data-transition='slide' href='/member?member=<%= follower.user_1 %>'><%= follower.user_1 %></a>  
+
+            <% } %>
+
+          </ul>
+
+        <% } %>
+
+        <%   if(followings.length > 0) { activity = true %>
+
+          <span class='subhead'>Your are following</span><ul>
+
+            <%  for (let following of followings) { %>
+             
+              <li><a data-transition='slide' href='/member?member=<%= following.user_1 %>'><%= following.user_1 %></a>
+
+            <% } %>
+
+          </ul>
+
+        <% } %>
+
+        <%  if(!activity) { %>
+          <br>You don't have any friends yet.
+        <% } %>
+    
+    
+    <% }  %>
+
+
+</body>

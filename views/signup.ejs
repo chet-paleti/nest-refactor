@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Page Title</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+
+    <script>
+      function checkUser(user)
+          {
+
+        
+            if (user.value == '')
+            {
+              $('#used').html('&nbsp;')
+            }else 
+            {
+      
+            $.post
+            (
+              '/checkuser',
+              { user : user.value },
+              function(data) {
+                $('#used').html(data)
+              }
+            )
+            }
+          }
+
+      </script>
+    
+ 
+    
+</head>
+<body>
+    <%- include('includes/head.ejs',{
+      loggedinUser : loggedinUser
+      }) 
+      %>
+
+
+      <%
+      if(success) { %>
+    
+        <h4>Account created</h4>Please Log in.
+            
+            
+        <% } else {  %>
+
+                    
+            <form method='post' action='/signup'><%=errormsg%>
+                <div data-role='fieldcontain'>
+                  <label></label>
+                  Please enter your details to sign up
+                </div>
+
+                <div data-role='fieldcontain'>
+                  <label>Username</label>
+                  <input type='text' maxlength='16' name='user' value='<%=user%>'
+                    onBlur='checkUser(this)'>
+                  <label></label><div id='used'>&nbsp;</div>
+                </div>
+                <div data-role='fieldcontain'>
+                  <label>Password</label>
+                  <input type='text' maxlength='16' name='pass' value=<%=passwd%>>
+                </div>
+                <div data-role='fieldcontain'>
+                  <label></label>
+                  <input data-transition='slide' type='submit' value='Sign Up'>
+                </div>
+              
+          </form>
+           
+       <%  } %>
+      
+      
+  
+         
+      
+    </body>
